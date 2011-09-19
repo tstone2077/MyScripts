@@ -1,0 +1,9 @@
+#!/bin/bash
+if [ -z "$STY" ]; then
+  existingScreen=$(screen -ls | grep Attached | cut -f 2)
+  if [ "" = "$existingScreen" ]; then
+    screen -q
+  else
+    screen -ARx $existingScreen
+  fi
+fi
