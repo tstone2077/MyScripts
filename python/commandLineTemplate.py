@@ -49,7 +49,7 @@ def validateArgs():
    
    parser.add_option("-v"
                         ,"--verbose"
-                        , default = "NOTSET"
+                        , default = "INFO"
                         , help="Level of verbose output to Display to stdout (DEBUG, INFO, WARNING, ERROR, CRITICAL, FATAL)")
 
    opts,args=parser.parse_args()
@@ -67,9 +67,7 @@ def main():
       opposed to this file being imported.
    """
    opts,args=validateArgs()
-   level=logging.NOTSET
-   if opts.verbose is not None:
-      level=getattr(logging,opts.verbose.upper())
+   level=getattr(logging,opts.verbose.upper())
    logging.basicConfig(level=level,
                     format= '' + LOG_MESSAGE_PREFIX + ':[%(asctime)s]:[%(levelname)s]: %(message)s')
 					
