@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ -z "$STY" ]; then
-  existingScreen=$(screen -ls | grep Attached | cut -f 2)
+  existingScreen=$(screen -ls | grep $(hostname) | cut -f 2)
   if [ "" = "$existingScreen" ]; then
     screen -q
   else
