@@ -17,7 +17,7 @@ import os
 from optparse import OptionParser
 import logging
 import hashlib
-from progressbar import ProgressBar, Counter, Timer, Percentage, Bar
+from progressbar import ProgressBar, Counter, Timer, Percentage, Bar, FormatLabel
 
 
 INVALID_USAGE_RETURN_CODE = 2
@@ -117,6 +117,15 @@ class HashPath:
             fh.close()
       return self.checksum.hexdigest()
 
+def GetHumanReadable(size,precision=2):
+   suffixes=['B','KB','MB','GB','TB']
+   suffixIndex = 0
+   while size > 1024:
+      suffixIndex += 1 #increment the suffix
+      size = size/1024.0 #apply the division
+   return "%.*f%s"%(precision,size,suffixes[suffixIndex])
+
+
 def sha1(paths,showProgress=False):
    hashPaths = []
    hashes = []
@@ -126,18 +135,10 @@ def sha1(paths,showProgress=False):
       hashPaths.append(hashPath)
       totalSize += hashPath.size
 
-   size = totalSize
-   suffixes=['B','KB','MB','GB','TB']
-   suffixIndex = 0
-   precision = 2
-   while size > 1024:
-      suffixIndex += 1 #increment the suffix
-      size = size/1024.0 #apply the division
-
-   logging.info("Hashing %.*f%s"%(precision,size,suffixes[suffixIndex]))
+   logging.info("Hashing %s"%GetHumanReadable(totalSize))
    pbar=None
    if showProgress:
-      pbar = ProgressBar(totalSize,[Counter()," ",Percentage(),Bar(),Timer()])
+      pbar = ProgressBar(totalSize,[FormatLabel('Processed %(value)d B in %(elapsed)s'),Bar()])
       pbar.start()
    for hashPath in hashPaths:
       hashes.append(hashPath.calculateHash(pbar))
