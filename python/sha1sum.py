@@ -17,7 +17,7 @@ import os
 from optparse import OptionParser
 import logging
 import hashlib
-from progressbar import ProgressBar, Counter, Timer, Percentage, Bar, FormatLabel
+from progressbar import ProgressBar, Counter, Timer, Percentage, Bar, FormatLabel, Percentage
 
 
 INVALID_USAGE_RETURN_CODE = 2
@@ -138,7 +138,7 @@ def sha1(paths,showProgress=False):
    logging.info("Hashing %s"%GetHumanReadable(totalSize))
    pbar=None
    if showProgress:
-      pbar = ProgressBar(totalSize,[FormatLabel('Processed %(value)d B in %(elapsed)s'),Bar()])
+      pbar = ProgressBar(totalSize,[Percentage()," (",Counter(formatterFunc=GetHumanReadable),")",FormatLabel(' in %(elapsed)s'),Bar()])
       pbar.start()
    for hashPath in hashPaths:
       hashes.append(hashPath.calculateHash(pbar))

@@ -168,12 +168,15 @@ RotatingMarker = AnimatedMarker
 class Counter(Widget):
     'Displays the current count'
 
-    __slots__ = ('format',)
+    __slots__ = ('format','formatterFunc',)
 
-    def __init__(self, format='%d'):
+    def __init__(self, format='%d', formatterFunc = None):
         self.format = format
+        self.formatterFunc = formatterFunc 
 
     def update(self, pbar):
+        if self.formatterFunc is not None:
+            return self.formatterFunc(pbar.currval)
         return self.format % pbar.currval
 
 
