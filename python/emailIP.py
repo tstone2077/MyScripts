@@ -19,6 +19,7 @@ from optparse import OptionParser
 import logging
 import urllib2
 import smtplib
+import socket
 from email.mime.text import MIMEText
 from ConfigParser import SafeConfigParser
 
@@ -65,6 +66,10 @@ def validateArgs():
                         ,"--ip"
                         , default = None
                         , help="expected ip.  If the current ip is different, an email will be sent")
+   parser.add_option("-H"
+                        ,"--fromHost"
+                        , default = socket.gethostname()
+                        , help="name to describe the host this script is running from")
    parser.add_option("-t"
                         ,"--toEmail"
                         , default = None
@@ -93,7 +98,7 @@ def validateArgs():
    if error is not None: raise InvalidUsage(parser,error)
    return opts,args
 
-def emailIP(configfile,toEmail = None, fromEmail = None, expectedIP = None, save = True):
+def emailIP(configfile,fromHost=None,toEmail = None, fromEmail = None, expectedIP = None, save = True):
     parser = SafeConfigParser()
     try:
        parser.read(configfile)
@@ -103,6 +108,8 @@ def emailIP(configfile,toEmail = None, fromEmail = None, expectedIP = None, save
           fromEmail  = parser.get("emailIP","fromemail")
        if not toEmail:
           toEmail  = parser.get("emailIP","toemail")
+       if not fromHost:
+          fromHost  = parser.get("emailIP","fromhost")
     except:
        pass
 
@@ -113,6 +120,8 @@ def emailIP(configfile,toEmail = None, fromEmail = None, expectedIP = None, save
        error = "fromEmail is not set"
     if not expectedIP:
        error = "expectedIP is not set"
+    if not fromHost:
+       error = "fromHost is not set"
     if error:
        raise InvalidInputs(error)
     
@@ -121,11 +130,12 @@ def emailIP(configfile,toEmail = None, fromEmail = None, expectedIP = None, save
     parser.set("emailIP","fromEmail",fromEmail)
     parser.set("emailIP","toEmail",toEmail)
     parser.set("emailIP","expectedIP",expectedIP)
+    parser.set("emailIP","fromHost",fromHost)
     currentIP = urllib2.urlopen("http://www.whatismyip.org").readlines()[0]
     if currentIP != expectedIP:
        logging.info( "%s != %s"%(currentIP,expectedIP))
        msg = MIMEText("IP Changed from %s to %s"%(expectedIP,currentIP))
-       msg['Subject'] = "New IP: %s"%currentIP
+       msg['Subject'] = "(%s) New IP: %s"%(fromHost,currentIP)
        msg['From'] = fromEmail
        msg['To'] = toEmail
        s = smtplib.SMTP('localhost')
@@ -149,7 +159,7 @@ def main():
    logging.basicConfig(level=level,
                     format= '' + LOG_MESSAGE_PREFIX + ':[%(asctime)s]:[%(levelname)s]: %(message)s')
 					
-   return emailIP(opts.config,opts.toEmail,opts.fromEmail,opts.ip,opts.save)
+   return emailIP(opts.config,opts.fromHost,opts.toEmail,opts.fromEmail,opts.ip,opts.save)
 
 # if this program is run on the command line, run the main function
 if __name__ == '__main__':
