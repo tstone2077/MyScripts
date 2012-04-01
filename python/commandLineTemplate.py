@@ -14,7 +14,7 @@ cmd_usage="""
 
 import sys
 import os
-from optparse import OptionParser
+import argparse
 import logging
 
 
@@ -44,19 +44,21 @@ def validateArgs():
    it returns opts,args
    """
 
-   parser=OptionParser(usage=cmd_usage,description=cmd_desc)
+   parser=argparse.ArgumentParser(usage=cmd_usage,description=cmd_desc)
    #general options
    
-   parser.add_option("-v"
+   parser.add_argument("-v"
                         ,"--verbose"
-                        , default = "INFO"
+                        , default = "ERROR"
+                        , const = "INFO"
+                        , nargs = "?"
                         , help="Level of verbose output to Display to stdout (DEBUG, INFO, WARNING, ERROR, CRITICAL, FATAL)")
 
-   opts,args=parser.parse_args()
+   args=parser.parse_args()
    error=None
 
    if error is not None: raise InvalidUsage(parser,error)
-   return opts,args
+   return args
 
 def commandLineTemplate():
     pass
@@ -66,8 +68,8 @@ def main():
       The main function.  This function will run if the command line is called as 
       opposed to this file being imported.
    """
-   opts,args=validateArgs()
-   level=getattr(logging,opts.verbose.upper())
+   args=validateArgs()
+   level=getattr(logging,args.verbose.upper())
    logging.basicConfig(level=level,
                     format= '' + LOG_MESSAGE_PREFIX + ':[%(asctime)s]:[%(levelname)s]: %(message)s')
 					
