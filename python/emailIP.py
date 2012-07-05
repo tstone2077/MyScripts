@@ -82,7 +82,7 @@ def validateArgs():
                         ,"--save"
                         , default = False
                         , action="store_true"
-                        , help="Save the settings to the config file if --ipor --email are entered")
+                        , help="Save the settings to the config file if --ip or --email are entered")
    parser.add_option("-c"
                         ,"--config"
                         , default = os.path.join(os.path.expanduser("~"),".emailIP")
@@ -119,7 +119,7 @@ def emailIP(configfile,fromHost=None,toEmail = None, fromEmail = None, expectedI
     if not fromEmail:
        error = "fromEmail is not set"
     if not expectedIP:
-       error = "expectedIP is not set"
+       expectedIP = ""
     if not fromHost:
        error = "fromHost is not set"
     if error:
@@ -131,7 +131,9 @@ def emailIP(configfile,fromHost=None,toEmail = None, fromEmail = None, expectedI
     parser.set("emailIP","toEmail",toEmail)
     parser.set("emailIP","expectedIP",expectedIP)
     parser.set("emailIP","fromHost",fromHost)
-    currentIP = urllib2.urlopen("http://www.whatismyip.org").readlines()[0]
+    #Parse wan ip data from my Belkin router
+    currentIP = urllib2.urlopen("http://192.168.2.1").readlines()[379].strip()
+    currentIP = currentIP.replace("document.write('","").replace("');","")
     if currentIP != expectedIP:
        logging.info( "%s != %s"%(currentIP,expectedIP))
        msg = MIMEText("IP Changed from %s to %s"%(expectedIP,currentIP))
