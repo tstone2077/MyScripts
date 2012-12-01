@@ -132,8 +132,11 @@ def emailIP(configfile,fromHost=None,toEmail = None, fromEmail = None, expectedI
     parser.set("emailIP","expectedIP",expectedIP)
     parser.set("emailIP","fromHost",fromHost)
     #Parse wan ip data from my Belkin router
-    currentIP = urllib2.urlopen("http://192.168.2.1").readlines()[379].strip()
-    currentIP = currentIP.replace("document.write('","").replace("');","")
+    #currentIP = urllib2.urlopen("http://192.168.2.1").readlines()[379].strip()
+    #currentIP = currentIP.replace("document.write('","").replace("');","")
+    currentIP = urllib2.urlopen("http://ifconfig.me/all").readlines()[0].split(":")[1].strip()
+    if currentIP == expectedIP:
+       logging.info( "IP Address %s has not changed"%currentIP)
     if currentIP != expectedIP:
        logging.info( "%s != %s"%(currentIP,expectedIP))
        msg = MIMEText("IP Changed from %s to %s"%(expectedIP,currentIP))
