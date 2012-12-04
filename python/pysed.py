@@ -105,7 +105,9 @@ def applyOnFile(file,searchRE,replace = None,inplace = False):
          print(updatedLines)
    else:
       #this should work like grep
-      pass
+      for i,line in enumerate(lines.split("\n")):
+         if searchRE.search(line) is not None:
+            print("%s:%d: %s"%(file,i+1,line))
 
 class Replacement(object):
    def __init__(self,searchRE,replaceStr):
@@ -138,25 +140,27 @@ def pysed(search, replace = None, globs = None, recurseRoot = None,
             inplace = False):
    
    searchRE = re.compile(search)
-   if globs is None:
+   if len(globs) == 0:
       globs = ['*']
 
-   files = []
+   filelist = []
    if recurseRoot:
-      logging.debug('Finding files under %s'%recursiveRoot)
+      logging.debug('Finding files under "%s"'%recurseRoot)
       from os import walk
       from os.path import join
       import fnmatch
-      for root,dirs,files in walk(recurse):
+      for root,dirs,files in walk(recurseRoot):
          for globStr in globs:
+            logging.debug('Searching for "%s"'%globStr)
             for filename in fnmatch.filter(files,globStr):
-               files.append(join(root,filename))
+               logging.debug('Found File: %s'%join(root,filename))
+               filelist.append(join(root,filename))
    else:
       for globStr in globs:
-         files.extend(glob.glob(globStr))
+         filelist.extend(glob.glob(globStr))
 
    #default output to stdout
-   for file in files:
+   for file in filelist:
       applyOnFile(file,searchRE,replace,inplace)
 
 def main():
