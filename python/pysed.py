@@ -161,7 +161,8 @@ def pysed(search, replace = None, globs = None, recurseRoot = None,
 
    #default output to stdout
    for file in filelist:
-      applyOnFile(file,searchRE,replace,inplace)
+      if os.path.isfile(file):
+         applyOnFile(file,searchRE,replace,inplace)
 
 def main():
    """  
