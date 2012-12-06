@@ -1,0 +1,3 @@
+[submodule "python/pysed"]
+	path = python/pysed
+	url = git@gist.github.com:4220819.git
