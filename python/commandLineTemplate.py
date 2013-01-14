@@ -4,7 +4,6 @@
   Usage:  
 """
 
-LOG_MESSAGE_PREFIX = "commandLineTemplate.py"
 cmd_desc="""
    Enter description here
    """
@@ -19,11 +18,10 @@ import logging
 
 
 INVALID_USAGE_RETURN_CODE = 2
+UNCAUGHT_EXCEPTION = 3
 
-try:
-   LOG_MESSAGE_PREFIX = os.path.basename(os.path.abspath(__file__))
-except:
-   pass
+SCRIPT_FILE = os.path.basename(os.path.abspath(__file__))
+SCRIPT_DIR  = os.path.dirname(os.path.abspath(__file__))
    
 
 class InvalidUsage(Exception):
@@ -35,7 +33,7 @@ class InvalidUsage(Exception):
     return self.error
   def printError(self):
     self.parser.print_usage()
-    print "ERROR: ",self.error
+    print("ERROR: %s"%(self.error))
 
 def validateArgs():
    """
@@ -61,7 +59,7 @@ def validateArgs():
    return args
 
 def commandLineTemplate():
-    pass
+   pass
 
 def main():
    """  
@@ -71,15 +69,22 @@ def main():
    args=validateArgs()
    level=getattr(logging,args.verbose.upper())
    logging.basicConfig(level=level,
-                    format= '' + LOG_MESSAGE_PREFIX + ':[%(asctime)s]:[%(levelname)s]: %(message)s')
+           format= '%(module)s(%(lineno)d)|[%(asctime)s]|[%(levelname)s]| %(message)s')
 					
-   return commandLineTemplate()
+   logging.debug("Python %s"%sys.version)
+   commandLineTemplate()
+   return 0
 
 # if this program is run on the command line, run the main function
 if __name__ == '__main__':
+   """
+   Add other return codes here based on the exceptions that bubble up.
+   """
    try:
       sys.exit(main())
-   except InvalidUsage,e:
+   except InvalidUsage as e:
       e.printError()
       sys.exit(INVALID_USAGE_RETURN_CODE)
-
+   except Exception as e:
+      print(e)
+      sys.exit(UNCAUGHT_EXCEPTION)
